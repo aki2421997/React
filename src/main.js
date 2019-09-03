@@ -7,7 +7,8 @@ class Main extends Component {
     state = { 
         url1: 'http://jsonplaceholder.typicode.com/users',
         url2: 'https://jsonplaceholder.typicode.com/comments',
-        value: ''
+        value: '',
+        header: ["name","street","lat","catchPhrase"]
      }
 
      updateValue=(value)=>{
@@ -20,8 +21,8 @@ class Main extends Component {
         return (
             <div>
                 <SearchBar updateValue={this.updateValue} value={this.state.value}/>
-                <SimpleTable classname="col" url={this.state.url1} value={this.state.value}/>
-                <SimpleTable classname="col" url={this.state.url2} value={this.state.value}/>
+                <SimpleTable classname="col" url={this.state.url1} value={this.state.value} header={this.state.header}/>
+                <SimpleTable classname="col" url={this.state.url2} value={this.state.value} header={this.state.header}/>
             </div>
           );
     }
