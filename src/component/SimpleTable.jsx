@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import MaterialTable from 'material-table';
 import './SearchBar.css';
+import { object } from 'prop-types';
 
 
 class SimpleTable extends Component {
@@ -13,30 +14,65 @@ class SimpleTable extends Component {
                 { title: 'Email', field: 'email'},
                 { title: 'Catch Phrase', field: 'company.catchPhrase'},
             ],
+            column1:[],
             contacts:[],
             permContacts:[],
             url : this.props.url,
-            value:''
         }
         
     }
 
+    setHeader=(row)=>{
+        let col = Object.keys(row);
+        let values = Object.values(row);
+        console.log(row);
+        
+        for (let index = 0; index < col.length; index++) {
+            let object1 = {
+                title : '',
+                field : ''
+            };
+            
+            console.log(col[index]+"  "+typeof values[index]);
+            
+            object1.title = col[index];
+            object1.field = col[index];
+
+            if (typeof values[index] !== 'object') {
+                this.state.column1.push(object1);  
+            }
+        }
+        
+    }
 
     filterList=(value)=>{
         var updatedList = this.state.permContacts;
-        updatedList = updatedList.filter(function(item){
-            return ((item.name.toLowerCase().search(value.toLowerCase())!== -1) || (item.username.toLowerCase().search(value.toLowerCase())!== -1))
+        updatedList = updatedList.filter((item)=>{
+            let flag = false;
+            for (let index = 0; index <  this.state.column1.length; index++) {
+                const element =  this.state.column1[index];
+                if (item[element.title].toString().search(value)!==-1) {
+                    flag = true;
+                }
+            }
+            if(flag)
+                return true;
+            else
+                return false;
         });
         this.setState({contacts: updatedList});
     } 
 
-    componentDidMount=() =>{
+    UNSAFE_componentWillMount() {
+        this.renderMyData();
+    }
+
+    renderMyData=() =>{
         fetch(this.state.url)
         .then(res => res.json())
         .then((data) => {
-            console.log(data);
-            
-          this.setState({ contacts: data ,permContacts : data})
+            this.setHeader(data[0]);
+            this.setState({ contacts: data ,permContacts : data})
         })
         .catch(console.log)
     }
@@ -61,8 +97,8 @@ class SimpleTable extends Component {
                   color: '#FFF'
                 }
                 }}
-                title="Employee Details"
-                columns={this.state.column}
+                title=""
+                columns={this.state.column1}
                 data={this.state.contacts}
             />
           );

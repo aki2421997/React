@@ -21,7 +21,7 @@ class Main extends Component {
             <div>
                 <SearchBar updateValue={this.updateValue} value={this.state.value}/>
                 <SimpleTable classname="col" url={this.state.url1} value={this.state.value}/>
-                <SimpleTable classname="col" url={this.state.url1} value={this.state.value}/>
+                <SimpleTable classname="col" url={this.state.url2} value={this.state.value}/>
             </div>
           );
     }
