@@ -8,7 +8,7 @@ class Main extends Component {
         url1: 'http://jsonplaceholder.typicode.com/users',
         url2: 'https://jsonplaceholder.typicode.com/comments',
         value: '',
-        header: ["name","street","lat","catchPhrase"]
+        header: ["name","street","username","lat"]
      }
 
      updateValue=(value)=>{

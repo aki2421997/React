@@ -15,42 +15,45 @@ class SimpleTable extends Component {
             ],
             column1:[],
             column2:[],
-            contacts:[],
-            permContacts:[],
+            column3:[],
+            contacts:[],//data to be displayed
+            permContacts:[],//data received
+            contactsTemp:[],//for filtering purpose
             url : this.props.url,
         }
         
     }
 
-    setHeaderColumn1=(row)=>{
-        let col = Object.keys(row);
-        let values = Object.values(row);
-        console.log(col+"         "+values);
+    // setHeaderColumn1=(row)=>{
+    //     let col = Object.keys(row);
+    //     let values = Object.values(row);
+    //     console.log(col+"         "+values);
         
-        for (let index = 0; index < col.length; index++) {
-            let object1 = {
-                title : '',
-                field : ''
-            };
+    //     for (let index = 0; index < col.length; index++) {
+    //         let object1 = {
+    //             title : '',
+    //             field : ''
+    //         };
 
-            //console.log(col[index]+"  "+typeof values[index]);
+    //         //console.log(col[index]+"  "+typeof values[index]);
             
-            object1.title = col[index];
-            object1.field = col[index];
+    //         object1.title = col[index];
+    //         object1.field = col[index];
 
-            if (typeof values[index] !== 'object') {
-                this.state.column1.push(object1);  
-            }
-        }
+    //         if (typeof values[index] !== 'object') {
+    //             this.state.column1.push(object1);  
+    //         }
+    //     }
         
-    }
+    // }
 
     setHeaderColumn2=(row)=>{
         let col = Object.keys(row);
         let values = Object.values(row);
-        console.log(row);
-        
         for (let index = 0; index < col.length; index++) {
+
+            
+            //to push in column2 for mui table
             let object1 = {
                 title : '',
                 field : ''
@@ -63,7 +66,7 @@ class SimpleTable extends Component {
 
             if (typeof values[index] !== 'object') {
                 if(this.check(col[index]))
-                    this.state.column1.push(object1);  
+                    this.state.column2.push(object1);  
             }
             else{
                 this.getObject(values[index],col[index]);
@@ -92,7 +95,7 @@ class SimpleTable extends Component {
         {
             
             for(var prop in theObject) {
-                console.log(prop + ': ' + theObject[prop]);
+                // console.log(prop + ': ' + theObject[prop]);
                 if(this.check(prop)) {
                     string += "."+prop;
                     let object1 = {
@@ -101,13 +104,13 @@ class SimpleTable extends Component {
                     };
                     object1.title = prop;
                     object1.field = string;
-                    this.state.column1.push(object1);
+                    this.state.column2.push(object1);
                     string = temp;
                 }
                 
                 if(theObject[prop] instanceof Object || theObject[prop] instanceof Array) {
                     string += "."+prop;
-                    console.log(string);
+                    // console.log(string);
                     
                     result = this.getObject(theObject[prop],string);
                     string = temp;
@@ -127,13 +130,58 @@ class SimpleTable extends Component {
         return false;
     }
 
+    setHeaderContacts=()=>{
+        for (let index = 0; index < this.state.column2.length; index++) {
+            let object1 = {
+                title : '',
+                field : ''
+            };
+            let getLastElem = this.state.column2[index].field.split(".");
+            object1.title = getLastElem[getLastElem.length-1];
+            object1.field = getLastElem[getLastElem.length-1];
+            this.state.column3.push(object1);
+            
+        }
+        
+        
+    }
+
+    modifyData=()=>{
+        //this.state.column2[index].field
+        for (let index1 = 0; index1 < this.state.permContacts.length; index1++) {
+            let object2 = {};
+            for (let index = 0; index < this.state.column2.length; index++) {
+                
+                let z = this.state.column2[index].field.split(".");
+                let temp ;
+                var p = this.state.permContacts[index1];
+                for (let index = 0; index < z.length; index++) {
+                    p = p[z[index]];
+                    temp = z[index];
+                }
+                //console.log("p="+p+" "+temp);
+                object2[ temp]=p;
+            }
+            this.state.contacts.push(object2);
+        }
+        //console.log(this.state.contacts[4]);
+        
+    }
+
     filterList=(value)=>{
-        var updatedList = this.state.permContacts;
+        var updatedList = this.state.contacts;
+        console.log(updatedList);
+        
         updatedList = updatedList.filter((item)=>{
+            //console.log(item);
+            
             let flag = false;
-            for (let index = 0; index <  this.state.column1.length; index++) {
-                const element =  this.state.column1[index];
-                if (item[element.title].toString().toLowerCase().search(value.toLowerCase())!==-1) {
+           // console.log(Object.keys(item)+"  >>"+this.state.column2[0].field);
+            for (let index = 0; index <  Object.keys(this.state.contacts[0]).length-1; index++) {
+                let getLastElem = this.state.column2[index].field.split(".");
+                //console.log(getLastElem[getLastElem.length-1]);
+                
+                if (item[getLastElem[getLastElem.length-1]].toString().toLowerCase().search(value.toLowerCase())!==-1) {
                     flag = true;
                 }
             }
@@ -142,8 +190,8 @@ class SimpleTable extends Component {
             else
                 return false;
         });
-        this.setState({contacts: updatedList});
-    } 
+        this.setState({contactsTemp: updatedList});
+    }
 
     UNSAFE_componentWillMount() {
         this.renderMyData();
@@ -154,7 +202,10 @@ class SimpleTable extends Component {
         .then(res => res.json())
         .then((data) => {
             this.setHeaderColumn2(data[0]);
-            this.setState({ contacts: data ,permContacts : data})
+            this.setState({ permContacts : data})
+            this.modifyData();
+            this.setHeaderContacts();
+            this.setState({ contactsTemp:this.state.contacts})
         })
         .catch(console.log)
     }
@@ -164,7 +215,11 @@ class SimpleTable extends Component {
             this.filterList(this.props.value);
             this.setState({value:this.props.value})
         }
-       }
+    }
+
+    componentDidMount() {
+        
+    }
 
     render() {
         return (
@@ -180,8 +235,8 @@ class SimpleTable extends Component {
                 }
                 }}
                 title=""
-                columns={this.state.column1}
-                data={this.state.contacts}
+                columns={ this.state.column3}
+                data={this.state.contactsTemp}
             />
           );
     }
