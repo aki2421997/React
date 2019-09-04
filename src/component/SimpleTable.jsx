@@ -13,7 +13,6 @@ class SimpleTable extends Component {
                 { title: 'Email', field: 'email'},
                 { title: 'Catch Phrase', field: 'company.catchPhrase'},
             ],
-            column1:[],
             column2:[],
             column3:[],
             contacts:[],//data to be displayed
@@ -23,29 +22,6 @@ class SimpleTable extends Component {
         }
         
     }
-
-    // setHeaderColumn1=(row)=>{
-    //     let col = Object.keys(row);
-    //     let values = Object.values(row);
-    //     console.log(col+"         "+values);
-        
-    //     for (let index = 0; index < col.length; index++) {
-    //         let object1 = {
-    //             title : '',
-    //             field : ''
-    //         };
-
-    //         //console.log(col[index]+"  "+typeof values[index]);
-            
-    //         object1.title = col[index];
-    //         object1.field = col[index];
-
-    //         if (typeof values[index] !== 'object') {
-    //             this.state.column1.push(object1);  
-    //         }
-    //     }
-        
-    // }
 
     setHeaderColumn2=(row)=>{
         let col = Object.keys(row);
@@ -58,8 +34,6 @@ class SimpleTable extends Component {
                 title : '',
                 field : ''
             };
-
-            // console.log(Object.keys(values[index])+"  "+values[index]);
             
             object1.title = col[index];
             object1.field = col[index];
@@ -70,16 +44,11 @@ class SimpleTable extends Component {
             }
             else{
                 this.getObject(values[index],col[index]);
-                // if(temp){
-                //     object1.title = temp;
-                //     object1.field = temp;
-                //     this.state.column1.push(object1);
-                // }
-                // console.log(temp);
             }
         }
     }
 
+    //to get path of required nested key 
     getObject=(theObject,string)=> {
         var result = null;
         var  temp = string;
@@ -95,7 +64,6 @@ class SimpleTable extends Component {
         {
             
             for(var prop in theObject) {
-                // console.log(prop + ': ' + theObject[prop]);
                 if(this.check(prop)) {
                     string += "."+prop;
                     let object1 = {
@@ -120,6 +88,7 @@ class SimpleTable extends Component {
         return result;
     }
 
+    //to check val is present in this.props.header
     check=(val)=>{
         for (let index = 0; index < this.props.header.length; index++) {
             if(val.toLowerCase() === this.props.header[index].toLowerCase()){
@@ -130,6 +99,7 @@ class SimpleTable extends Component {
         return false;
     }
 
+    //to set column for mui table
     setHeaderContacts=()=>{
         for (let index = 0; index < this.state.column2.length; index++) {
             let object1 = {
@@ -142,12 +112,10 @@ class SimpleTable extends Component {
             this.state.column3.push(object1);
             
         }
-        
-        
     }
 
+    //to build data from api call as per keys in this.props.header
     modifyData=()=>{
-        //this.state.column2[index].field
         for (let index1 = 0; index1 < this.state.permContacts.length; index1++) {
             let object2 = {};
             for (let index = 0; index < this.state.column2.length; index++) {
@@ -159,28 +127,21 @@ class SimpleTable extends Component {
                     p = p[z[index]];
                     temp = z[index];
                 }
-                //console.log("p="+p+" "+temp);
                 object2[ temp]=p;
             }
             this.state.contacts.push(object2);
         }
-        //console.log(this.state.contacts[4]);
-        
     }
 
+    //for filtering the this.state.contacts
     filterList=(value)=>{
         var updatedList = this.state.contacts;
         console.log(updatedList);
         
         updatedList = updatedList.filter((item)=>{
-            //console.log(item);
-            
             let flag = false;
-           // console.log(Object.keys(item)+"  >>"+this.state.column2[0].field);
             for (let index = 0; index <  Object.keys(this.state.contacts[0]).length-1; index++) {
                 let getLastElem = this.state.column2[index].field.split(".");
-                //console.log(getLastElem[getLastElem.length-1]);
-                
                 if (item[getLastElem[getLastElem.length-1]].toString().toLowerCase().search(value.toLowerCase())!==-1) {
                     flag = true;
                 }
@@ -197,6 +158,7 @@ class SimpleTable extends Component {
         this.renderMyData();
     }
 
+    //make api call 
     renderMyData=() =>{
         fetch(this.state.url)
         .then(res => res.json())
@@ -210,17 +172,14 @@ class SimpleTable extends Component {
         .catch(console.log)
     }
 
+    //on change in search bar (handle onChange)
     componentDidUpdate(prevProps) {
         if (this.props.value !== prevProps.value) {
             this.filterList(this.props.value);
             this.setState({value:this.props.value})
         }
     }
-
-    componentDidMount() {
-        
-    }
-
+    
     render() {
         return (
             <MaterialTable
