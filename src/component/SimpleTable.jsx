@@ -6,16 +6,8 @@ import './SearchBar.css';
 class SimpleTable extends Component {
     constructor(props) {
         super(props);
-        this.state = {  
-            column:[
-                { title: 'Name', field: 'name' },
-                { title: 'Username', field: 'username' },
-                { title: 'Email', field: 'email'},
-                { title: 'Catch Phrase', field: 'company.catchPhrase'},
-            ],
-            column1:[],
-            column2:[],
-            column3:[],
+        this.state = {
+            column1:[],//for header of table
             contacts:[],//data to be displayed
             permContacts:[],//data received
             contactsTemp:[],//for filtering purpose
@@ -44,8 +36,10 @@ class SimpleTable extends Component {
                     title : '',
                     field : ''
                 };
-                object1.title = exists;
-                object1.field = exists;
+                object1.title = this.props.header[index];
+                object1.field = this.props.header[index];
+                //console.log("title="+object1.title+" field="+object1.field);
+                
                 this.state.column1.push(object1);
             }
         }
@@ -60,7 +54,9 @@ class SimpleTable extends Component {
             for (let index = 0; index < this.props.header.length; index++) {
                 let exists = this.checkForCol(this.props.header[index],index1);
                 if(exists){
-                    object2[exists[0]] = exists[1];
+                    //console.log(exists[0]+" = "+exists[1]);
+                    
+                    object2[this.props.header[index]] = exists[1];
                 }
             }
             this.state.contacts.push(object2);
@@ -77,8 +73,10 @@ class SimpleTable extends Component {
             p=p[arr[index]];
             if(typeof p ==="undefined")
                 break;
+            //console.log("p=="+p+"  "+arr[index]);
+            
         }
-        if(index === arr.length)
+        if(index === arr.length && !(p instanceof Object))
             return [arr[index-1],p];
         return false;
     }
@@ -116,6 +114,8 @@ class SimpleTable extends Component {
             this.setState({ permContacts : data})
             this.setColFromHeader();
             this.modifyData();
+            console.log(this.state.contacts[0]);
+            console.log(this.state.permContacts[0]);
             this.setState({ contactsTemp:this.state.contacts})
         })
         .catch(console.log)
