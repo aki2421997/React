@@ -5,7 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.3.3",
     "bootstrap": "^4.3.1",
-    "contentful": "^7.9.1",
+    "contentful": "^11.8.2",
     "git": "^0.1.5",
     "loadash": "^1.0.0",
     "material": "^0.3.13",
